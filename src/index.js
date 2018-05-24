@@ -6,8 +6,7 @@ import compose from './compose'
 import warning from './utils/warning'
 
 /*
-* This is a dummy function to check if the function name has been altered by minification.
-* If the function has been minified and NODE_ENV !== 'production', warn the user.
+* 一个虚拟函数，判断代码是否被压缩，如果不是在production环境下进行了代码压缩，会发出警告
 */
 function isCrushed() {}
 

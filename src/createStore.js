@@ -2,36 +2,26 @@ import isPlainObject from 'lodash/isPlainObject'
 import $$observable from 'symbol-observable'
 
 /**
- * These are private action types reserved by Redux.
- * For any unknown actions, you must return the current state.
- * If the current state is undefined, you must return the initial state.
- * Do not reference these action types directly in your code.
+ * Redux私有的Action.
+ * 对于所有未知的Action，必须返回该类型
+ * 如果当前state为定义，必须返回初始状态
+ * 不要在代码中直接引用该类型
  */
 export var ActionTypes = {
   INIT: '@@redux/INIT'
 }
 
 /**
- * Creates a Redux store that holds the state tree.
- * The only way to change the data in the store is to call `dispatch()` on it.
+ * 创建一个store保存 redux 的 state，
+ * 只能通过调用 dispatch 方法改变 store 的数据
  *
- * There should only be a single store in your app. To specify how different
- * parts of the state tree respond to actions, you may combine several reducers
- * into a single reducer function by using `combineReducers`.
+ * 整个程序应该只有一个 store，如果有多个 state 要响应不同的 Action，可以通过 combineReducers 方法将多个 reducer 合成一个
  *
- * @param {Function} reducer A function that returns the next state tree, given
- * the current state tree and the action to handle.
+ * @param {Function} reducer 响应对应的 Action 并返回操作过后的 state
  *
- * @param {any} [preloadedState] The initial state. You may optionally specify it
- * to hydrate the state from the server in universal apps, or to restore a
- * previously serialized user session.
- * If you use `combineReducers` to produce the root reducer function, this must be
- * an object with the same shape as `combineReducers` keys.
+ * @param {any} [preloadedState] Redux 初始的 state，如果使用 combineReducers 合成 reducer， 字段要和 reducer 保存一直
  *
- * @param {Function} enhancer The store enhancer. You may optionally specify it
- * to enhance the store with third-party capabilities such as middleware,
- * time travel, persistence, etc. The only store enhancer that ships with Redux
- * is `applyMiddleware()`.
+ * @param {Function} 中间件，使用 applyMiddleware 来添加中间件
  *
  * @returns {Store} A Redux store that lets you read the state, dispatch actions
  * and subscribe to changes.
