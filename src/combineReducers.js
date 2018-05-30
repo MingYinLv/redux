@@ -56,8 +56,10 @@ function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, une
 function assertReducerSanity(reducers) {
   Object.keys(reducers).forEach(key => {
     var reducer = reducers[key]
+    // 对所有的 reducer 进行初始化
     var initialState = reducer(undefined, { type: ActionTypes.INIT })
 
+    // 如果某个初始化的 state 为 undefined， 报错
     if (typeof initialState === 'undefined') {
       throw new Error(
         `Reducer "${key}" returned undefined during initialization. ` +
@@ -68,6 +70,7 @@ function assertReducerSanity(reducers) {
     }
 
     var type = '@@redux/PROBE_UNKNOWN_ACTION_' + Math.random().toString(36).substring(7).split('').join('.')
+    // 其他所有未知的 action type 必须返回当前的 state tree
     if (typeof reducer(undefined, { type }) === 'undefined') {
       throw new Error(
         `Reducer "${key}" returned undefined when probed with a random type. ` +
@@ -104,15 +107,19 @@ export default function combineReducers(reducers) {
     var key = reducerKeys[i]
 
     if (process.env.NODE_ENV !== 'production') {
+      // 开发环境下如果某个 reducer 为 undefined ，发出警告
       if (typeof reducers[key] === 'undefined') {
         warning(`No reducer provided for key "${key}"`)
       }
     }
 
+    // 如果 reducer 是 function，赋值
     if (typeof reducers[key] === 'function') {
       finalReducers[key] = reducers[key]
     }
   }
+
+  //所有的 reducer name
   var finalReducerKeys = Object.keys(finalReducers)
 
   if (process.env.NODE_ENV !== 'production') {
@@ -121,12 +128,15 @@ export default function combineReducers(reducers) {
 
   var sanityError
   try {
+    // 验证所有的reducer
     assertReducerSanity(finalReducers)
   } catch (e) {
+    // 捕获错误
     sanityError = e
   }
 
   return function combination(state = {}, action) {
+    // 如果有错误抛出
     if (sanityError) {
       throw sanityError
     }
