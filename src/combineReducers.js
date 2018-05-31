@@ -85,20 +85,14 @@ function assertReducerSanity(reducers) {
 }
 
 /**
- * Turns an object whose values are different reducer functions, into a single
- * reducer function. It will call every child reducer, and gather their results
- * into a single state object, whose keys correspond to the keys of the passed
- * reducer functions.
+ * 将多个 reducer function 转换成一个 reducer function，它会调用所有的 reducer function，并将
+ * 所有的 reducer 的返回结果应用到对应的 state tree 中
  *
- * @param {Object} reducers An object whose values correspond to different
- * reducer functions that need to be combined into one. One handy way to obtain
- * it is to use ES6 `import * as reducers` syntax. The reducers may never return
- * undefined for any action. Instead, they should return their initial state
- * if the state passed to them was undefined, and the current state for any
- * unrecognized action.
+ * @param {Object} reducers 的对象集合，对于任何操作 reducer 都不会返回 undefined
+ * 如果传给 reducer 的 state 为定义，会返回初始状态
  *
- * @returns {Function} A reducer function that invokes every reducer inside the
- * passed object, and builds a state object with the same shape.
+ * @returns {Function} 一个 reducer function，它调用 reducers 中所有的 reducer function
+ * 并应用到对应的 state tree 中
  */
 export default function combineReducers(reducers) {
   var reducerKeys = Object.keys(reducers)
@@ -148,20 +142,26 @@ export default function combineReducers(reducers) {
       }
     }
 
+    // state tree 是否更新
     var hasChanged = false
     var nextState = {}
     for (var i = 0; i < finalReducerKeys.length; i++) {
-      var key = finalReducerKeys[i]
-      var reducer = finalReducers[key]
-      var previousStateForKey = state[key]
-      var nextStateForKey = reducer(previousStateForKey, action)
+      var key = finalReducerKeys[i] // reducer name
+      var reducer = finalReducers[key] // reducer function
+      var previousStateForKey = state[key] // 之前的 state 值
+      var nextStateForKey = reducer(previousStateForKey, action) // 调用 reducer 之后的 state 值
+      // 如果返回值是 undefined
       if (typeof nextStateForKey === 'undefined') {
         var errorMessage = getUndefinedStateErrorMessage(key, action)
         throw new Error(errorMessage)
       }
+      // 赋值
       nextState[key] = nextStateForKey
+      // 浅对比
       hasChanged = hasChanged || nextStateForKey !== previousStateForKey
     }
+    // 如果没有 state 发生变化返回之前的 state
+    // PS: 如果 state 是引用类型, 它的子属性发生改变， 不会更新 hasChanged
     return hasChanged ? nextState : state
   }
 }
